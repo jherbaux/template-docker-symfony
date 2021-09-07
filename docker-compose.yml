@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: 'docker/nginx/Dockerfile'
+      args:
+        NGINX_VERSION: ${NGINX_VERSION}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "../../src:/var/www/html:ro"
+    env_file:
+      - .env
+
+  php-fpm:
+    container_name: php-fpm
+    build:
+      context: .
+      dockerfile: "docker/php-fpm/Dockerfile"
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
+    environment:
+      USER_ID: ${USER_ID}
+      GROUP_ID: ${GROUP_ID}
+    env_file:
+      - .env
+    volumes:
+      - "../../src:/var/www/html"
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: "docker/mariadb"
+      args:
+        SQL_VERSION: ${SQL_VERSION}
+    ports:
+      - 3306:3306
+    volumes:
+      - "mariadb:/var/lib/mysql"
+    env_file:
+      - .env
+
+volumes:
+    mariadb:
+
+networks:
+  host:    
