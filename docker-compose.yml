@@ -13,7 +13,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - "../../src:/var/www/html:ro"
+      - "./:/var/www/html:ro"
     env_file:
       - .env
 
@@ -31,10 +31,10 @@ services:
     env_file:
       - .env
     volumes:
-      - "../../src:/var/www/html"
+      - "./:/var/www/html"
 
-  mariadb:
-    container_name: mariadb
+  database:
+    container_name: database
     build:
       context: "docker/mariadb"
       args:
@@ -42,12 +42,19 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "mariadb:/var/lib/mysql"
+      - "database:/var/lib/mysql"
     env_file:
       - .env
 
+  adminer:
+    image: adminer
+    depends_on:
+      - database    
+    ports:
+      - 8080:8080
+
 volumes:
-    mariadb:
+    database:
 
 networks:
   host:    

@@ -41,19 +41,15 @@ COPY ./docker/php-fpm/config/php.ini /usr/local/etc/php/php.ini
 COPY ./docker/php-fpm/config/xdebug.ini ./docker/php-fpm/config/apcu.ini /usr/local/etc/php/conf.d/
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN wget https://get.symfony.com/cli/installer -O - | bash \
-    && mv /root/.symfony/bin/symfony /usr/local/bin/symfony \
-    && mkdir /var/www/.symfony \
-    && chown www-data:www-data /var/www/.symfony
+
+
+RUN echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | tee /etc/apt/sources.list.d/symfony-cli.list
+RUN apt update
+RUN apt install symfony-cli
 
 RUN curl -o /usr/local/bin/composer https://getcomposer.org/composer-2.phar
 RUN chmod 0755 /usr/local/bin/composer
-#RUN composer global require hirak/prestissimo
 
-#ADD ./install_scripts/install_privilege.sh /install.sh
-#RUN chmod 700 /install.sh && sh /install.sh && rm -rf /install.sh
-
-#RUN chown -R www-data:www-data /var/www/
 ENV XDEBUG_MODE=coverage
 
 COPY ./docker/php-fpm/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
